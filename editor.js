@@ -12,22 +12,22 @@ $(document).ready(function() {
       this.canvas = document.getElementById("render");
       this.canvas.width = this.canvas.offsetWidth;
       this.canvas.height = this.canvas.offsetHeight;
-    },       
+    },
     clearWindow: function() {
       var ctx = this.canvas.getContext("2d");
       ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
     }
-
   });
   
-  var Engine = Context.extend({
+  var Executor = Context.extend({
     init: function(code) {
       this.code = code;
+      this._super();
     },
     execute: function() {
       try {        
         var f = new Function(this.code);
-        f();
+        f.call(this);
       } catch(err) {
         console.log(err);
       }
@@ -35,7 +35,7 @@ $(document).ready(function() {
   });
   
   editor.on("change", function(cm, change) {
-    var e = new Engine(cm.getValue());
-    e.execute();                      
+    var e = new Executor(cm.getValue());
+    e.execute();
   });
 });
