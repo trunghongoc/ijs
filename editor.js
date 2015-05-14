@@ -7,26 +7,35 @@ $(document).ready(function() {
     theme: "eclipse"
   });
   
-  var Context = (function() {
-    var canvas = $("#render")[0];
-    canvas.width = canvas.offsetWidth;
-    canvas.height = canvas.offsetHeight;
-    function clearWindow() {
-      var ctx = canvas.getContext("2d");
+  var Context = Class.extend({
+    init: function() {
+      this.canvas = document.getElementById("render");
+      this.canvas.width = this.canvas.offsetWidth;
+      this.canvas.height = this.canvas.offsetHeight;
+    },       
+    clearWindow: function() {
+      var ctx = this.canvas.getContext("2d");
       ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
     }
-    return {
-      canvas: canvas,
-      clear: clearWindow
-    };
-  })();
+
+  });
   
-  editor.on("change", function(cm, change) {                   
-    try {        
-      var f = new Function(cm.getValue());
-      f.call(Context);
-    } catch(err) {
-      console.log(err);
+  var Engine = Context.extend({
+    init: function(code) {
+      this.code = code;
+    },
+    execute: function() {
+      try {        
+        var f = new Function(this.code);
+        f();
+      } catch(err) {
+        console.log(err);
+      }
     }
+  });
+  
+  editor.on("change", function(cm, change) {
+    var e = new Engine(cm.getValue());
+    e.execute();                      
   });
 });
